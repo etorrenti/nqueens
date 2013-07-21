@@ -5,7 +5,7 @@
  Version     :
  Copyright   : Beerware license
 
- Risoluzione del problema delle N regine per mezzo di algoritmi genetici
+ N-queens problem solver featuring genetic algorithms and libgaul
  ============================================================================
  */
 
@@ -25,7 +25,7 @@ void print_chromosome(population *pop, entity *entity) {
 }
 
 boolean fitness(population *pop, entity *entity) {
-	int k; /* Loop variable over all alleles. */
+	int k;
 
 	entity->fitness = 1000.0;
 
@@ -116,10 +116,6 @@ entity *slight_adaptation(population *pop, entity *child) {
 	return child;
 }
 
-/*
- * Muove la regina in una colonna a caso in modo da migliorare
- * la fitness del cromosoma
- */
 entity *best_adaptation(population *pop, entity *child) {
 	entity *adult = ga_entity_clone(pop, child);
 	int allele = random_int(N);
