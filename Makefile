@@ -1,4 +1,7 @@
 CC=gcc
+#For debug
+#CFLAGS=-c -Wall -g
+#For release
 CFLAGS=-c -Wall -O3
 LDFLAGS=
 SOURCES=src/nqueens.c

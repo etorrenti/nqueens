@@ -21,7 +21,7 @@
 /*
  * Initial population size
  */
-#define POPULATION 30
+#define POPULATION 50
 /*
  * Maximum iterations
  */
@@ -30,13 +30,17 @@
 /*
  * Penalties to be used in fitness function
  */
-#define ROW_PENALTY 0.8
-#define DIAG_PENALTY 0.8
+#define PENALTY 0.8
 
 /*
  * For debug purposes
  */
-#define PRINT_TOP_N 5
+#define PRINT_TOP_N 3
+
+/*
+ * Maximum fitness
+ */
+#define MAX_FITNESS 1000.0
 
 /*
  * Print a chromosome
@@ -48,6 +52,11 @@ void print_chromosome(population *pop, entity *entity);
  * value of 1000.0
  */
 boolean fitness(population *pop, entity *entity);
+
+/*
+ * Alternative measurement of fitness
+ */
+boolean fitness_alt(population *pop, entity *entity);
 
 /*
  * Draw a not yet drawn number according to *drawn array

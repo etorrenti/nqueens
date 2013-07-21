@@ -27,12 +27,11 @@ void print_chromosome(population *pop, entity *entity) {
 boolean fitness(population *pop, entity *entity) {
 	int k;
 
-	entity->fitness = 1000.0;
+	entity->fitness = MAX_FITNESS;
+	int *chromosome = (int*) (entity->chromosome[0]);
 
 	/* Loop over alleles in chromosome. */
 	for (k = 0; k < pop->len_chromosomes; k++) {
-		//printf("%d\n",k);
-		int *chromosome = (int*) (entity->chromosome[0]);
 		int i;
 		for (i = 0; i < pop->len_chromosomes - 1; i++) {
 			int j;
@@ -40,22 +39,12 @@ boolean fitness(population *pop, entity *entity) {
 				int vi = chromosome[i];
 				int vj = chromosome[j];
 
-				if (vi < 0 || vi >= N) {
-					entity->fitness = 0;
-					return FALSE;
-				}
-
-				if (vj < 0 || vj >= N) {
-					entity->fitness = 0;
-					return FALSE;
-				}
-
-				if (abs(vi - vj) == j - i) {
-					entity->fitness *= DIAG_PENALTY;
-				}
-
 				if (vi == vj) {
-					entity->fitness *= ROW_PENALTY;
+					entity->fitness *= PENALTY;
+				}
+
+				if(abs(vi - vj) == j - i){
+					entity->fitness *= PENALTY;
 				}
 			}
 		}
@@ -65,8 +54,7 @@ boolean fitness(population *pop, entity *entity) {
 
 int draw(bool* drawn) {
 	int n;
-	while (drawn[(n = random_int(N))]) {
-	}
+	while (drawn[(n = random_int(N))]) {}
 	return n;
 }
 
@@ -98,7 +86,7 @@ boolean my_generation_hook(const int generation, population *pop) {
 		print_chromosome(pop, e);
 	}
 	printf("---------------------\n\n");
-	return ga_get_entity_from_rank(pop, 0)->fitness < 1000.0;
+	return ga_get_entity_from_rank(pop, 0)->fitness < MAX_FITNESS;
 }
 
 entity *slight_adaptation(population *pop, entity *child) {
@@ -182,16 +170,14 @@ int main(void) {
 	GA_SCHEME_BALDWIN_ALL, /* const ga_class_type     class */
 	GA_ELITISM_PARENTS_SURVIVE, /* const ga_elitism_type   elitism */
 	0.9, /* double                  crossover */
-	0.1, /* double                  mutation */
+	0.05, /* double                  mutation */
 	0.0 /* double                  migration */
 	);
 
 	pop->allele_max_integer = N - 1;
 	pop->allele_min_integer = 0;
 
-	int iterations = ga_evolution(pop, /* population          *pop */
-	GENERATIONS /* const int           max_generations */
-	);
+	int iterations = ga_evolution(pop, GENERATIONS);
 
 	printf(
 			"The best solution after %d iterations with Lamarckian evolution was:\n",
