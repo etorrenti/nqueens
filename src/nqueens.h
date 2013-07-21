@@ -25,7 +25,7 @@
 /*
  * Maximum iterations
  */
-#define GENERATIONS 1400000
+#define GENERATIONS 10000
 
 /*
  * Penalties to be used in fitness function
@@ -54,11 +54,6 @@ void print_chromosome(population *pop, entity *entity);
 boolean fitness(population *pop, entity *entity);
 
 /*
- * Alternative measurement of fitness
- */
-boolean fitness_alt(population *pop, entity *entity);
-
-/*
  * Draw a not yet drawn number according to *drawn array
  */
 int draw(bool* drawn);
@@ -74,23 +69,8 @@ boolean seedCheesboard(population *pop, entity *adam);
 boolean my_generation_hook(const int generation, population *pop);
 
 /*
- * Some adaptation functions to choose upon
- */
-
-/*
- * Change a random allele in order to get the best fitness
- */
-entity *best_adaptation(population *pop, entity *child);
-
-/*
  * Change a random allele with a random value
  */
-entity *slight_adaptation(population *pop, entity *child);
-
-/*
- * Increment or decrement a random allele in order to get
- * an improved individual
- */
-entity *struggle_adaptation(population *pop, entity *child);
+entity *adaptation(population *pop, entity *child);
 
 #endif /* NQUEENS_H_ */

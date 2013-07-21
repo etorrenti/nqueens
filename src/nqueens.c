@@ -25,27 +25,23 @@ void print_chromosome(population *pop, entity *entity) {
 }
 
 boolean fitness(population *pop, entity *entity) {
-	int k;
-
 	entity->fitness = MAX_FITNESS;
 	int *chromosome = (int*) (entity->chromosome[0]);
 
 	/* Loop over alleles in chromosome. */
-	for (k = 0; k < pop->len_chromosomes; k++) {
-		int i;
-		for (i = 0; i < pop->len_chromosomes - 1; i++) {
-			int j;
-			for (j = i + 1; j < pop->len_chromosomes; j++) {
-				int vi = chromosome[i];
-				int vj = chromosome[j];
+	int i;
+	for (i = 0; i < N - 1; i++) {
+		int j;
+		for (j = i + 1; j < N; j++) {
+			int vi = chromosome[i];
+			int vj = chromosome[j];
 
-				if (vi == vj) {
-					entity->fitness *= PENALTY;
-				}
+			if (vi == vj) {
+				entity->fitness *= PENALTY;
+			}
 
-				if(abs(vi - vj) == j - i){
-					entity->fitness *= PENALTY;
-				}
+			if (abs(vi - vj) == j - i) {
+				entity->fitness *= PENALTY;
 			}
 		}
 	}
@@ -63,10 +59,10 @@ boolean seedCheesboard(population *pop, entity *adam) {
 	bool* drawn;
 	drawn = calloc(N, sizeof(bool));
 
+	int *chromosome = (int*) (adam->chromosome[0]);
 	for (i = 0; i < N; i++) {
 		int n = draw(drawn);
 		drawn[n] = TRUE;
-		int *chromosome = (int*) (adam->chromosome[0]);
 		chromosome[i] = n;
 	}
 
@@ -89,58 +85,18 @@ boolean my_generation_hook(const int generation, population *pop) {
 	return ga_get_entity_from_rank(pop, 0)->fitness < MAX_FITNESS;
 }
 
-entity *slight_adaptation(population *pop, entity *child) {
+entity *adaptation(population *pop, entity *child) {
 	entity *adult = ga_entity_clone(pop, child);
 	int allele = random_int(N);
 	int val = random_int(N);
 
 	((int *) adult->chromosome[0])[allele] = val;
-
 	fitness(pop, adult);
 
 	if (adult->fitness > child->fitness)
 		return adult;
 
 	return child;
-}
-
-entity *best_adaptation(population *pop, entity *child) {
-	entity *adult = ga_entity_clone(pop, child);
-	int allele = random_int(N);
-	int i;
-	for (i = 0; i < N; i++) {
-		((int *) adult->chromosome[0])[allele] = i;
-		fitness(pop, adult);
-
-		if (adult->fitness > child->fitness)
-			return adult;
-	}
-
-	return child;
-}
-
-entity *struggle_adaptation(population *pop, entity *child) {
-	entity *adult = ga_entity_clone(pop, child);
-	int allele = random_int(N);
-
-	((int *) adult->chromosome[0])[allele]++;
-	fitness(pop, adult);
-
-	if (adult->fitness > child->fitness)
-		return adult;
-
-	/* Searching in that previous direction didn't help. */
-	((int *) adult->chromosome[0])[allele] -= 2;
-	fitness(pop, adult);
-
-	if (adult->fitness > child->fitness)
-		return adult;
-
-	/* We must already be at a maxima. */
-	((int *) adult->chromosome[0])[allele]++;
-	adult->fitness = child->fitness;
-
-	return adult;
 }
 
 int main(void) {
@@ -157,7 +113,7 @@ int main(void) {
 	NULL, /* GAdata_ref_incrementor data_ref_incrementor */
 	fitness, /* GAevaluate             evaluate */
 	seedCheesboard, /* GAseed                 seed */
-	slight_adaptation, /* GAadapt                adapt */
+	adaptation, /* GAadapt                adapt */
 	ga_select_one_roulette, /* GAselect_one           select_one */
 	ga_select_two_roulette, /* GAselect_two           select_two */
 	ga_mutate_integer_singlepoint_drift, /* GAmutate  mutate */
@@ -167,10 +123,10 @@ int main(void) {
 	);
 
 	ga_population_set_parameters(pop, /* population              *pop */
-	GA_SCHEME_BALDWIN_ALL, /* const ga_class_type     class */
-	GA_ELITISM_PARENTS_SURVIVE, /* const ga_elitism_type   elitism */
+	GA_SCHEME_LAMARCK_ALL, /* const ga_class_type     class */
+	GA_ELITISM_PARENTS_DIE, /* const ga_elitism_type   elitism */
 	0.9, /* double                  crossover */
-	0.05, /* double                  mutation */
+	0.1, /* double                  mutation */
 	0.0 /* double                  migration */
 	);
 
